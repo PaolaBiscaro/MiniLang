@@ -1,2 +1,5 @@
+import re
 def rArith(value : str):
-  return 0
+  if (re.fullmatch(r"[+-*/]", value)):
+    return "Arith"
+  return None
