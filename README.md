@@ -12,6 +12,6 @@
 ---
 ## Identificadores e Palavras reservadas
 
-- [Código](https://github.com/PaolaBiscaro/MiniLang/blob/dev-helo/functions/identificadores.py)
+- [Código](https://github.com/PaolaBiscaro/MiniLang/blob/main/functions/identificadores.py)
 
-- [Documentação](https://github.com/PaolaBiscaro/MiniLang/blob/dev-helo/documentation/identificadores.md)
+- [Documentação](https://github.com/PaolaBiscaro/MiniLang/blob/main/documentation/identificadores.md)
