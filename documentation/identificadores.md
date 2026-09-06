@@ -5,10 +5,10 @@
 Ele é o padrão base de identificadores
 
 ### Descrição informal
-Começa com uma letra ou o undeline '_' e depois pode ter letas, digitos, ou undeline '_'
+Começa com uma letra ou o undeline '\_' e depois pode ter letas, digitos, ou undeline '\_'
 
 ### Exemplos que são aceitos
-"total2", "_contagem", "x", "_"
+"total2", "_contagem", "x", "\_"
 
 ### Definição matemática
 $LIdentBase = Inicial Continuacao*$
