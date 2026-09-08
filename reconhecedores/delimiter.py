@@ -22,15 +22,3 @@ def classify_delimiter(word:str) -> str:
    
     return None
         
-
-if __name__ == "__main__":
-    # Exemplos de palavras candidatas a um único delimitador.
-    word = " "
-    word2 = ";;;"
-    word3 = "valor;;"
-    word4 = "("
-    word5 = ")"
-    word6 = "}"
-    word7 = ";"
-
-    print(classify_delimiter(word))
