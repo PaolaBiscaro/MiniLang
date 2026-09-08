@@ -1,9 +1,8 @@
 import re
 
-DELIMITER_CORE = re.compile(r"[();]")
-BLOCK_DELIMITER = re.compile(r"[{}]")
-
 def classify_delimiter(word:str) -> str:
+    DELIMITER_CORE = re.compile(r"[();]")
+    BLOCK_DELIMITER = re.compile(r"[{}]")
     tokens = {
         "(": "LPAREN",
         ")": "RPAREN",
@@ -21,16 +20,17 @@ def classify_delimiter(word:str) -> str:
         result = tokens.get(word)
         return result
    
-    return "REJECTED"
+    return None
         
 
-#Casos de teste
-word = "valor;" #??
-word2 = ";;;"
-word3 = "valor;;"
-word4 = "("
-word5 = ")"
-word6= "}"
-word7 = ";"
+if __name__ == "__main__":
+    # Exemplos de palavras candidatas a um único delimitador.
+    word = " "
+    word2 = ";;;"
+    word3 = "valor;;"
+    word4 = "("
+    word5 = ")"
+    word6 = "}"
+    word7 = ";"
 
-print(classify_delimiter(word))
+    print(classify_delimiter(word))

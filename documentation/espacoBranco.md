@@ -33,9 +33,9 @@ Após os espaços em branco serem removidos, o analisador avança para a leitura
 
 | Entrada | Esperado | Obtido | Categoria | Justificativa |
 | :--- | :--- | :--- | :--- | :--- |
-| int valor | IGNORED | "['int', 'valor']" | Comum | Contem strings comuns |
-| \n | IGNORED | "[]" | Fronteira | Contem somente uma quebra de linha |
-| \n \t | IGNORED | "[]" | Fronteira | Contem uma quebra de linha e uma tabulação |
-| \n var teste | IGNORED | "['var', 'teste']" | Comum | Possui outros tipos de palavras. |
-| " 1 + 1" | IGNORED | "['1', '+', '1']" | Comum | Mantem somente o que não pertence aos espacos em branco |
+| int valor | IGNORED | None | Comum | Contem strings comuns |
+| \n | IGNORED | True | Fronteira | Contem somente uma quebra de linha |
+| \n \t | IGNORED | None | Fronteira | Contem uma quebra de linha e uma tabulação |
+| \n var teste | IGNORED | None | Comum | Possui outros tipos de palavras. |
+| " 1 + 1" | IGNORED | None | Comum | Mantem somente o que não pertence aos espacos em branco |
 
