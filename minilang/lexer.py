@@ -27,10 +27,23 @@ SINGLE_CHAR_TOKENS = {
     ';': "SEMICOLON",
 }
 
+KEYWORDS = {
+    "int": "KW_INT",
+    "print": "KW_PRINT",
+    "if": "KW_IF",
+    "else": "KW_ELSE",
+    "while": "KW_WHILE",
+}
+
 #Indices
 start = 0
 start_line = 1
 start_column = 1
+
+source = ""
+current = 0
+line = 1
+column = 1
 
 def scan_tokens():
     while not at_end():
@@ -98,7 +111,8 @@ def scan_token():
         
     
 def at_end():
-    pass
+    return current >= len(source)
+    
 
 def advance():
     pass
@@ -107,7 +121,10 @@ def peek():
     pass
 
 def peek_next():
-    pass
+    if current + 1 >= len(source):
+        return '\0'
+
+    return source[current + 1]
 
 def match():
     pass
@@ -115,8 +132,21 @@ def match():
 def add_token():
     pass
 
-def identifier():
-    pass
+def identifier():  # depende de source, start, current, peek, advance e add_token
+    while (
+        ('a' <= peek() <= 'z')
+        or ('A' <= peek() <= 'Z')
+        or ('0' <= peek() <= '9')
+        or peek() == '_'
+    ):
+        advance()
+
+    lexeme = source[start:current]
+
+    if lexeme in KEYWORDS:
+        add_token(KEYWORDS[lexeme])
+    else:
+        add_token("IDENT")
 
 def number():
     pass
