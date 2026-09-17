@@ -115,7 +115,18 @@ def at_end():
     
 
 def advance():
-    pass
+    global current, line, column
+
+    char = source[current]
+    current += 1
+
+    if char == '\n':
+        line += 1
+        column = 1
+    else:
+        column += 1
+
+    return char    
 
 def peek():
     pass
@@ -126,8 +137,15 @@ def peek_next():
 
     return source[current + 1]
 
-def match():
-    pass
+def match(expected):
+    if at_end():
+        return False
+    
+    if source[current] == expected:
+        advance()
+        return True
+    
+    return False
 
 def add_token():
     pass
@@ -149,7 +167,12 @@ def identifier():  # depende de source, start, current, peek, advance e add_toke
         add_token("IDENT")
 
 def number():
-    pass
+    while not at_end():
+        if peek() >= '0' and peek() <= '9':
+            advance()
+        else:
+            break
+    add_token("INT_LITERAL")
 
 def line_comment():
     while not at_end() and peek() not in ('\r', '\n'):
