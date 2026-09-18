@@ -45,6 +45,9 @@ current = 0
 line = 1
 column = 1
 
+tokens = []
+errors = []
+
 def scan_tokens():
     while not at_end():
         
@@ -147,8 +150,18 @@ def match(expected):
     
     return False
 
-def add_token():
-    pass
+def add_token(token_type, lexeme=None):
+    if lexeme is None:
+        lexeme = source[start:current]
+
+    token = {
+        "type": token_type,
+        "lexeme": lexeme,
+        "line": start_line,
+        "column": start_column,
+    }
+
+    tokens.append(token)
 
 def identifier():  # depende de source, start, current, peek, advance e add_token
     while (
@@ -178,7 +191,14 @@ def line_comment():
     while not at_end() and peek() not in ('\r', '\n'):
         advance()
 
-def report_invalid_character():
-    pass 
+def report_invalid_character(c):
+    error = {
+        "character": c,
+        "line": start_line,
+        "column": start_column,
+        "message": "Caractere inválido",
+    }
+
+    errors.append(error)
 
         
