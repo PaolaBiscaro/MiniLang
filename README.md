@@ -5,7 +5,34 @@ Paola Biscaro - 2005412
 Lorena de Souza - 1996291
 Heloísa Ribeiro - 1992348
 
----
+
+## Execução do Projeto
+Dentro da pasta do projeto, execute o seguinte comando:
+
+```sh
+python main.py
+```
+Para realizar outros testes, acesse a pasta `./arquivo-txt`e realize a alteração do arquivo `programa.txt`.
+
+
+## Organização do Lexer
+
+```sh
+MiniLang/
+├── README.md
+├── minilang/
+│   ├── ...
+│   └── lexer.py
+├── arquivo-txt/
+│   └── programa.txt
+├── documentation/
+├── reconhecedores/
+├── tests/
+├── examples/
+└── main.py
+```
+
+
 ## Tabela das 11 classes:
 
 | Classe | O que reconhece | Exemplos aceitos | Ação futura do lexer |

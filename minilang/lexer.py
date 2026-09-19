@@ -1,20 +1,3 @@
-"""
-scan_tokens - Paola
-scan_token - Paola
-at_end - Heloisa
-advance - Lorena
-peek - Lucas
-peek_next - Heloisa
-match - Lorena
-add_token - Lucas
-identifier - Heloisa
-number - Lorena
-line_comment - Paola
-report_invalid_character - Lucas
-"""
-
-import re
-
 SINGLE_CHAR_TOKENS = {
     '/': "SLASH",
     '+': "PLUS",
@@ -49,13 +32,21 @@ tokens = []
 errors = []
 
 def scan_tokens():
+    global start, start_line, start_column
+
     while not at_end():
-        
-        """start ← current
-            start_line ← line
-            start_column ← column"""
-            
+        start = current
+        start_line = line
+        start_column = column
         scan_token()
+
+    tokens.append({
+        "type": "EOF",
+        "lexeme": "",
+        "line": line,
+        "column": column,
+    })
+    return tokens, errors
         
 def scan_token():
     if peek() == "/" and peek_next() == "/":
@@ -123,7 +114,7 @@ def advance():
     char = source[current]
     current += 1
 
-    if char == '\n':
+    if char in ('\r', '\n'):
         line += 1
         column = 1
     else:
@@ -132,7 +123,9 @@ def advance():
     return char    
 
 def peek():
-    pass
+    if at_end():
+        return '\0'
+    return source[current]
 
 def peek_next():
     if current + 1 >= len(source):
