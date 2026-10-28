@@ -114,3 +114,54 @@ def expressao():
         )
 
     return esquerda
+
+def atribuicao():
+    identificador = expect("IDENT")
+    expect("ASSIGN")
+    expressao_atribuida = expressao()
+    expect("SEMICOLON")
+
+    return ast_nodes.atribuicao(identificador, expressao_atribuida)
+
+def declaracao():
+    expect("KW_INT")
+    identificador = expect("IDENT")
+    expect("SEMICOLON")
+
+    return ast_nodes.declaracao(identificador)
+
+def saida():
+    expect("KW_PRINT")
+    expect("LPAREN")
+    expressao_saida = expressao()
+    expect("RPAREN")
+    expect("SEMICOLON")
+
+    return ast_nodes.saida(expressao_saida)
+
+def item():
+    token = peek()
+
+    if token["type"] == "KW_INT":
+        return declaracao()
+
+    if token["type"] == "IDENT":
+        return atribuicao()
+
+    if token["type"] == "KW_PRINT":
+        return saida()
+
+    raise SyntaxError(
+        f'Linha {token["line"]}, coluna {token["column"]}: '
+        f'esperado declaração, atribuição ou print, '
+        f'encontrado {token["type"]} ({token["lexeme"]!r}).'
+    )
+    
+def lista_itens():
+    comandos = []
+
+    while not at_end():
+        comando = item()
+        comandos.append(comando)
+
+    return comandos
