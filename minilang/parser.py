@@ -1,7 +1,5 @@
 from minilang import ast_nodes
 
-#vamos usar funcoes parecidas com as do lexer, mas para percorrer de token em token e nao simbolos
-#entao apenas adpatei o que ja tinhamos recebendo a lista de tokens do lexer
 tokens = []
 current = 0
 
@@ -48,19 +46,29 @@ def match(tipos):
     return False
 
 
+def erro_sintatico(esperado, token=None): #Ela informa o que o parser esperava, qual token encontrou e sua posição
+    if token is None:
+        token = peek()
+
+    linha = token.get("line", "?")
+    coluna = token.get("column", "?")
+    tipo = token.get("type", "DESCONHECIDO")
+    lexema = token.get("lexeme", "")
+
+    return SyntaxError(
+        f"Linha {linha}, coluna {coluna}: "
+        f"esperado {esperado}, encontrado {tipo} ({lexema!r})."
+    )
+
+
 def expect(tipo):
     token = peek()
 
     if token["type"] == tipo:
         return advance()
 
-    raise SyntaxError(
-        f'Linha {token["line"]}, coluna {token["column"]}: '
-        f'esperado {tipo}, encontrado {token["type"]} '
-        f'({token["lexeme"]!r}).'
-    )
+    raise erro_sintatico(tipo, token)
 
-# o factor, termo e expressao vao identificar as precedencias  
 def factor():
     if match(["INT_LITERAL"]):
         token = previous()
@@ -75,13 +83,7 @@ def factor():
         expect("RPAREN")
         return no
 
-    token = peek()
-
-    raise SyntaxError(
-        f'Linha {token["line"]}, coluna {token["column"]}: '
-        f'esperado inteiro, identificador ou "(", '
-        f'encontrado {token["type"]} ({token["lexeme"]!r}).'
-    )
+    raise erro_sintatico('inteiro, identificador ou "("')
 
 
 def termo():
@@ -151,11 +153,7 @@ def item():
     if token["type"] == "KW_PRINT":
         return saida()
 
-    raise SyntaxError(
-        f'Linha {token["line"]}, coluna {token["column"]}: '
-        f'esperado declaração, atribuição ou print, '
-        f'encontrado {token["type"]} ({token["lexeme"]!r}).'
-    )
+    raise erro_sintatico("declaração, atribuição ou print", token)
     
 def lista_itens():
     comandos = []
@@ -165,3 +163,11 @@ def lista_itens():
         comandos.append(comando)
 
     return comandos
+
+
+def programa():
+    comandos = lista_itens()
+
+    expect("EOF")
+
+    return ast_nodes.programa(comandos)

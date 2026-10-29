@@ -1,8 +1,13 @@
 from pathlib import Path
-from minilang import lexer
+import sys
+
+from minilang import ast_nodes, lexer, parser
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
     caminho = Path(__file__).parent / "arquivo-txt" / "programa.txt"
 
     try:
@@ -23,21 +28,25 @@ def main():
 
     tokens, errors = lexer.scan_tokens()
 
-    print("TOKENS")
-    for token in tokens:
+    if errors:
+        error = errors[0]
         print(
-            f'{token["line"]}:{token["column"]} '
-            f'{token["type"]} {token["lexeme"]!r}'
+            f'Erro léxico na linha {error["line"]}, '
+            f'coluna {error["column"]}: '
+            f'{error["message"]}: {error["character"]!r}.'
         )
+        return 1
 
-    print("\nDIAGNÓSTICOS")
-    for error in errors:
-        print(
-            f'{error["line"]}:{error["column"]} '
-            f'{error["message"]}: {error["character"]!r}'
-        )
+    parser.iniciar(tokens)
 
-    return 1 if errors else 0
+    try:
+        arvore = parser.programa()
+    except SyntaxError as erro:
+        print(f"Erro sintático: {erro}")
+        return 1
+
+    print(ast_nodes.visualizar(arvore))
+    return 0
 
 
 if __name__ == "__main__":
