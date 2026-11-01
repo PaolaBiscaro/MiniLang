@@ -1,3 +1,9 @@
+from pathlib import Path
+import sys
+
+PASTA_PROJETO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PASTA_PROJETO))
+
 from reconhecedores.rArith import rArith
 from reconhecedores.rAssign import rAssing
 from reconhecedores.comparison import rel_op
