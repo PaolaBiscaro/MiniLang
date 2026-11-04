@@ -35,6 +35,34 @@ def atribuicao(identificador, expressao):
         "identificador": identificador,
         "expressao": expressao,
     }
+    
+def bloco(comandos):
+    return {"tipo": "Bloco", "comandos": comandos}
+
+
+#if
+def se(condicao, entao, senao=None):
+    return {
+        "tipo": "Se",
+        "condicao": condicao,
+        "entao": entao,
+        "senao": senao,
+    }
+
+#while
+def enquanto(condicao, corpo):
+    return {"tipo": "Enquanto", "condicao": condicao, "corpo": corpo}
+
+
+#for
+def para(inicializacao, condicao, atualizacao, corpo):
+    return {
+        "tipo": "Para",
+        "inicializacao": inicializacao,
+        "condicao": condicao,
+        "atualizacao": atualizacao,
+        "corpo": corpo,
+    }
 
 
 def saida(expressao):
@@ -69,10 +97,10 @@ def _rotulo(no): #usado no visualizar
     return tipo
 
 
-def _filhos(no):#usado no visualizar
+def _filhos(no):
     tipo = no["tipo"]
 
-    if tipo == "Programa":
+    if tipo in ("Programa", "Bloco"):
         return no["comandos"]
 
     if tipo == "Binaria":
@@ -81,7 +109,25 @@ def _filhos(no):#usado no visualizar
     if tipo in ("Atribuicao", "Saida"):
         return [no["expressao"]]
 
+    if tipo == "Se":
+        filhos = [no["condicao"], no["entao"]]
+        if no["senao"] is not None:
+            filhos.append(no["senao"])
+        return filhos
+
+    if tipo == "Enquanto":
+        return [no["condicao"], no["corpo"]]
+
+    if tipo == "Para":
+        return [
+            no["inicializacao"],
+            no["condicao"],
+            no["atualizacao"],
+            no["corpo"],
+        ]
+
     return []
+
 
 
 def visualizar(no): #para fazer o arvore bonitinha no terminal

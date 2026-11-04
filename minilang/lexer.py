@@ -16,6 +16,7 @@ KEYWORDS = {
     "if": "KW_IF",
     "else": "KW_ELSE",
     "while": "KW_WHILE",
+    "for": "KW_FOR",
 }
 
 #Indices

@@ -141,6 +141,7 @@ def saida():
 
     return ast_nodes.saida(expressao_saida)
 
+
 def item():
     token = peek()
 
@@ -153,7 +154,19 @@ def item():
     if token["type"] == "KW_PRINT":
         return saida()
 
-    raise erro_sintatico("declaração, atribuição ou print", token)
+    if token["type"] == "KW_IF":
+        return comando_if()
+
+    if token["type"] == "KW_WHILE":
+        return comando_while()
+
+    if token["type"] == "KW_FOR":
+        return comando_for()
+
+    raise erro_sintatico(
+        "declaração, atribuição, print, if, while ou for", token
+    )
+    
     
 def lista_itens():
     comandos = []
@@ -171,3 +184,75 @@ def programa():
     expect("EOF")
 
     return ast_nodes.programa(comandos)
+
+
+def condicao():
+    esquerda = expressao()
+
+    if not match([
+        "LESS", "LESS_EQUAL", "GREATER", "GREATER_EQUAL",
+        "EQUAL_EQUAL", "BANG_EQUAL",
+    ]):
+        raise erro_sintatico("operador relacional (<, <=, >, >=, == ou !=)")
+
+    operador = previous()
+    direita = expressao()
+    return ast_nodes.binaria(esquerda, operador, direita)
+
+
+def bloco():
+    expect("LBRACE")
+    comandos = []
+
+    while not at_end() and peek()["type"] != "RBRACE":
+        comandos.append(item())
+
+    expect("RBRACE")
+    return ast_nodes.bloco(comandos)
+
+
+def comando_if():
+    expect("KW_IF")
+    expect("LPAREN")
+    teste = condicao()
+    expect("RPAREN")
+    entao = bloco()
+    senao = None
+
+    if match(["KW_ELSE"]):
+        senao = bloco()
+
+    return ast_nodes.se(teste, entao, senao)
+
+
+def comando_while():
+    expect("KW_WHILE")
+    expect("LPAREN")
+    teste = condicao()
+    expect("RPAREN")
+    corpo = bloco()
+    return ast_nodes.enquanto(teste, corpo)
+
+
+def atribuicao_sem_ponto_virgula():
+    identificador = expect("IDENT")
+    expect("ASSIGN")
+    valor = expressao()
+    return ast_nodes.atribuicao(identificador, valor)
+
+
+def comando_for():
+    expect("KW_FOR")
+    expect("LPAREN")
+
+    inicializacao = atribuicao_sem_ponto_virgula()
+    expect("SEMICOLON")
+
+    teste = condicao()
+    expect("SEMICOLON")
+
+    atualizacao = atribuicao_sem_ponto_virgula()
+    expect("RPAREN")
+
+    corpo = bloco()
+    return ast_nodes.para(inicializacao, teste, atualizacao, corpo)
