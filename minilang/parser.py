@@ -97,12 +97,13 @@ def termo():
             esquerda,
             operador,
             direita,
+            tipo_expr="int",
         )
 
     return esquerda
 
 
-def expressao():
+def expressao_aritmetica():
     esquerda = termo()
 
     while match(["PLUS", "MINUS"]):
@@ -113,6 +114,26 @@ def expressao():
             esquerda,
             operador,
             direita,
+            tipo_expr="int",
+        )
+
+    return esquerda
+
+
+def expressao():
+    esquerda = expressao_aritmetica()
+
+    if match([
+        "LESS", "LESS_EQUAL", "GREATER", "GREATER_EQUAL",
+        "EQUAL_EQUAL", "BANG_EQUAL",
+    ]):
+        operador = previous()
+        direita = expressao_aritmetica()
+        return ast_nodes.binaria(
+            esquerda,
+            operador,
+            direita,
+            tipo_expr="bool",
         )
 
     return esquerda
@@ -125,12 +146,12 @@ def atribuicao():
 
     return ast_nodes.atribuicao(identificador, expressao_atribuida)
 
-def declaracao():
-    expect("KW_INT")
+def declaracao(tipo):
+    tipo_token = expect(tipo)
     identificador = expect("IDENT")
     expect("SEMICOLON")
 
-    return ast_nodes.declaracao(identificador)
+    return ast_nodes.declaracao(identificador, tipo_token)
 
 def saida():
     expect("KW_PRINT")
@@ -146,7 +167,10 @@ def item():
     token = peek()
 
     if token["type"] == "KW_INT":
-        return declaracao()
+        return declaracao("KW_INT")
+
+    if token["type"] == "KW_BOOL":
+        return declaracao("KW_BOOL")
 
     if token["type"] == "IDENT":
         return atribuicao()
@@ -162,6 +186,8 @@ def item():
 
     if token["type"] == "KW_FOR":
         return comando_for()
+    if token["type"] == "LBRACE":
+        return bloco()
 
     raise erro_sintatico(
         "declaração, atribuição, print, if, while ou for", token
@@ -187,7 +213,7 @@ def programa():
 
 
 def condicao():
-    esquerda = expressao()
+    esquerda = expressao_aritmetica()
 
     if not match([
         "LESS", "LESS_EQUAL", "GREATER", "GREATER_EQUAL",
@@ -196,8 +222,13 @@ def condicao():
         raise erro_sintatico("operador relacional (<, <=, >, >=, == ou !=)")
 
     operador = previous()
-    direita = expressao()
-    return ast_nodes.binaria(esquerda, operador, direita)
+    direita = expressao_aritmetica()
+    return ast_nodes.binaria(
+        esquerda,
+        operador,
+        direita,
+        tipo_expr="bool",
+    )
 
 
 def bloco():

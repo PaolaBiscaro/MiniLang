@@ -3,6 +3,7 @@ def inteiro(token):
     return {
         "tipo": "Inteiro",
         "token": token,
+        "tipo_expr": "int",
     }
 
 
@@ -10,22 +11,28 @@ def identificador(token):
     return {
         "tipo": "Identificador",
         "token": token,
+        # O tipo depende da declaração visível neste ponto do programa.
+        # Ele será preenchido pela análise semântica.
+        "tipo_expr": None,
     }
 
 
-def binaria(esquerda, operador, direita):
+def binaria(esquerda, operador, direita, tipo_expr=None):
     return {
         "tipo": "Binaria",
         "esquerda": esquerda,
         "operador": operador,
         "direita": direita,
+        "tipo_expr": tipo_expr,
     }
 
 
-def declaracao(identificador):
+def declaracao(identificador, tipo_token=None):
     return {
         "tipo": "Declaracao",
         "identificador": identificador,
+        "tipo_token": tipo_token,
+        "tipo_declarado": tipo_token["lexeme"] if tipo_token else None,
     }
 
 
@@ -83,15 +90,21 @@ def _rotulo(no): #usado no visualizar
     tipo = no["tipo"]
 
     if tipo == "Inteiro":
-        return f'{tipo}({no["token"]["lexeme"]})'
+        return f'{tipo}({no["token"]["lexeme"]}):{no["tipo_expr"]}'
 
     if tipo == "Identificador":
-        return f'Variavel({no["token"]["lexeme"]})'
+        tipo_expr = no.get("tipo_expr") or "?"
+        return f'Variavel({no["token"]["lexeme"]}):{tipo_expr}'
 
     if tipo == "Binaria":
-        return f'Binaria({no["operador"]["lexeme"]})'
+        tipo_expr = no.get("tipo_expr") or "?"
+        return f'Binaria({no["operador"]["lexeme"]}):{tipo_expr}'
 
-    if tipo in ("Declaracao", "Atribuicao"):
+    if tipo == "Declaracao":
+        tipo_declarado = no.get("tipo_declarado") or "?"
+        return f'Declaracao({no["identificador"]["lexeme"]}):{tipo_declarado}'
+
+    if tipo == "Atribuicao":
         return f'{tipo}({no["identificador"]["lexeme"]})'
 
     return tipo

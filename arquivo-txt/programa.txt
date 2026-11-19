@@ -1,5 +1,12 @@
-int x;
-x = 0;
-for (i = 0; i < 3; i = i + 1) {
-    print(i);
-}
+int total;
+total = 10;
+{
+  int limite;
+  bool acima;
+  limite = 5;
+  acima = total > limite;
+  total = limite + acima;
+  total = acima;
+  }
+print(acima);
+int total;
