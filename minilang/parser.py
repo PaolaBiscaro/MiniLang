@@ -74,6 +74,9 @@ def factor():
         token = previous()
         return ast_nodes.inteiro(token)
 
+    if match(["TRUE", "FALSE"]):
+        return ast_nodes.booleano(previous())
+
     if match(["IDENT"]):
         token = previous()
         return ast_nodes.identificador(token)
@@ -83,7 +86,7 @@ def factor():
         expect("RPAREN")
         return no
 
-    raise erro_sintatico('inteiro, identificador ou "("')
+    raise erro_sintatico('inteiro, booleano, identificador ou "("')
 
 
 def termo():
@@ -93,12 +96,7 @@ def termo():
         operador = previous()
         direita = factor()
 
-        esquerda = ast_nodes.binaria(
-            esquerda,
-            operador,
-            direita,
-            tipo_expr="int",
-        )
+        esquerda = ast_nodes.binaria(esquerda, operador, direita)
 
     return esquerda
 
@@ -110,12 +108,7 @@ def expressao_aritmetica():
         operador = previous()
         direita = termo()
 
-        esquerda = ast_nodes.binaria(
-            esquerda,
-            operador,
-            direita,
-            tipo_expr="int",
-        )
+        esquerda = ast_nodes.binaria(esquerda, operador, direita)
 
     return esquerda
 
@@ -129,14 +122,10 @@ def expressao():
     ]):
         operador = previous()
         direita = expressao_aritmetica()
-        return ast_nodes.binaria(
-            esquerda,
-            operador,
-            direita,
-            tipo_expr="bool",
-        )
+        return ast_nodes.binaria(esquerda, operador, direita)
 
     return esquerda
+
 
 def atribuicao():
     identificador = expect("IDENT")
@@ -212,25 +201,6 @@ def programa():
     return ast_nodes.programa(comandos)
 
 
-def condicao():
-    esquerda = expressao_aritmetica()
-
-    if not match([
-        "LESS", "LESS_EQUAL", "GREATER", "GREATER_EQUAL",
-        "EQUAL_EQUAL", "BANG_EQUAL",
-    ]):
-        raise erro_sintatico("operador relacional (<, <=, >, >=, == ou !=)")
-
-    operador = previous()
-    direita = expressao_aritmetica()
-    return ast_nodes.binaria(
-        esquerda,
-        operador,
-        direita,
-        tipo_expr="bool",
-    )
-
-
 def bloco():
     expect("LBRACE")
     comandos = []
@@ -243,9 +213,9 @@ def bloco():
 
 
 def comando_if():
-    expect("KW_IF")
+    token = expect("KW_IF")
     expect("LPAREN")
-    teste = condicao()
+    teste = expressao()
     expect("RPAREN")
     entao = bloco()
     senao = None
@@ -253,16 +223,16 @@ def comando_if():
     if match(["KW_ELSE"]):
         senao = bloco()
 
-    return ast_nodes.se(teste, entao, senao)
+    return ast_nodes.se(token, teste, entao, senao)
 
 
 def comando_while():
-    expect("KW_WHILE")
+    token = expect("KW_WHILE")
     expect("LPAREN")
-    teste = condicao()
+    teste = expressao()
     expect("RPAREN")
     corpo = bloco()
-    return ast_nodes.enquanto(teste, corpo)
+    return ast_nodes.enquanto(token, teste, corpo)
 
 
 def atribuicao_sem_ponto_virgula():
@@ -273,17 +243,17 @@ def atribuicao_sem_ponto_virgula():
 
 
 def comando_for():
-    expect("KW_FOR")
+    token = expect("KW_FOR")
     expect("LPAREN")
 
     inicializacao = atribuicao_sem_ponto_virgula()
     expect("SEMICOLON")
 
-    teste = condicao()
+    teste = expressao()
     expect("SEMICOLON")
 
     atualizacao = atribuicao_sem_ponto_virgula()
     expect("RPAREN")
 
     corpo = bloco()
-    return ast_nodes.para(inicializacao, teste, atualizacao, corpo)
+    return ast_nodes.para(token, inicializacao, teste, atualizacao, corpo)

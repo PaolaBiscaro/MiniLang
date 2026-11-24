@@ -18,6 +18,8 @@ KEYWORDS = {
     "while": "KW_WHILE",
     "for": "KW_FOR",
     "bool": "KW_BOOL",
+    "TRUE": "TRUE",
+    "FALSE": "FALSE",
 }
 
 #Indices

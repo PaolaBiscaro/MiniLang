@@ -1,7 +1,7 @@
 from pathlib import Path
 import sys
 
-from minilang import ast_nodes, lexer, parser
+from minilang import ast_nodes, lexer, parser, semantic
 
 
 def main():
@@ -45,8 +45,34 @@ def main():
         print(f"Erro sintático: {erro}")
         return 1
 
+    escopos, diagnosticos = semantic.analisar(arvore)
+
+    print("Tabelas de símbolos")
+    for escopo, tabela in enumerate(escopos):
+        nome_escopo = "global" if escopo == 0 else "bloco"
+        print(f"Escopo {escopo} ({nome_escopo})")
+        if not tabela:
+            print("  (sem declarações)")
+        for nome, simbolo in tabela.items():
+            token = simbolo["token"]
+            print(
+                f'  {simbolo["id"]} {nome}: {simbolo["tipo"]} '
+                f'em {token["line"]}:{token["column"]}'
+            )
+
+    print("\nAST anotada")
     print(ast_nodes.visualizar(arvore))
-    return 0
+
+    print("\nDiagnósticos semânticos")
+    if not diagnosticos:
+        print("Nenhum erro semântico.")
+    for erro in diagnosticos:
+        print(
+            f'{erro["linha"]}:{erro["coluna"]} '
+            f'[{erro["codigo"]}] {erro["mensagem"]}'
+        )
+
+    return 1 if diagnosticos else 0
 
 
 if __name__ == "__main__":

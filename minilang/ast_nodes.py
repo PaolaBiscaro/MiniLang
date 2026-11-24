@@ -7,6 +7,10 @@ def inteiro(token):
     }
 
 
+def booleano(token):
+    return {"tipo": "Booleano", "token": token, "tipo_expr": "bool"}
+
+
 def identificador(token):
     return {
         "tipo": "Identificador",
@@ -48,23 +52,25 @@ def bloco(comandos):
 
 
 #if
-def se(condicao, entao, senao=None):
+def se(token, condicao, entao, senao=None):
     return {
         "tipo": "Se",
+        "token": token,
         "condicao": condicao,
         "entao": entao,
         "senao": senao,
     }
 
 #while
-def enquanto(condicao, corpo):
-    return {"tipo": "Enquanto", "condicao": condicao, "corpo": corpo}
+def enquanto(token, condicao, corpo):
+    return {"tipo": "Enquanto", "token": token, "condicao": condicao, "corpo": corpo}
 
 
 #for
-def para(inicializacao, condicao, atualizacao, corpo):
+def para(token, inicializacao, condicao, atualizacao, corpo):
     return {
         "tipo": "Para",
+        "token": token,
         "inicializacao": inicializacao,
         "condicao": condicao,
         "atualizacao": atualizacao,
@@ -88,13 +94,19 @@ def programa(comandos):
 
 def _rotulo(no): #usado no visualizar
     tipo = no["tipo"]
+    simbolo = no.get("simbolo")
+    vinculo = ""
+    if simbolo is not None:
+        vinculo = f' -> {simbolo["id"]}'
+    elif "simbolo" in no:
+        vinculo = " -> sem vínculo"
 
-    if tipo == "Inteiro":
+    if tipo in ("Inteiro", "Booleano"):
         return f'{tipo}({no["token"]["lexeme"]}):{no["tipo_expr"]}'
 
     if tipo == "Identificador":
         tipo_expr = no.get("tipo_expr") or "?"
-        return f'Variavel({no["token"]["lexeme"]}):{tipo_expr}'
+        return f'Variavel({no["token"]["lexeme"]}):{tipo_expr}{vinculo}'
 
     if tipo == "Binaria":
         tipo_expr = no.get("tipo_expr") or "?"
@@ -102,10 +114,13 @@ def _rotulo(no): #usado no visualizar
 
     if tipo == "Declaracao":
         tipo_declarado = no.get("tipo_declarado") or "?"
-        return f'Declaracao({no["identificador"]["lexeme"]}):{tipo_declarado}'
+        return f'Declaracao({no["identificador"]["lexeme"]}):{tipo_declarado}{vinculo}'
 
     if tipo == "Atribuicao":
-        return f'{tipo}({no["identificador"]["lexeme"]})'
+        return f'{tipo}({no["identificador"]["lexeme"]}){vinculo}'
+
+    if tipo == "Bloco" and "escopo" in no:
+        return f'Bloco (escopo {no["escopo"]})'
 
     return tipo
 
